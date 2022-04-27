@@ -105,7 +105,6 @@ class Game extends React.Component {
                     player={this.state.current.player}
                     squares={this.state.current.squares}
                     status={this.state.current.status}
-                    changeTurn={() => this.changeTurn()}
                     squareClick={(i) => this.squareClick(i)}
                 />
                 </div>
