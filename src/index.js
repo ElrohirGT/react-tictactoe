@@ -70,7 +70,7 @@ function Board(props) {
         return changeTurnDict[currentPlayer];
     }
     squareClick(i) {
-        if (this.state.gameEnded)
+        if (this.state.current.gameEnded)
             return;
 
         //Deep copy, this way the values between states are not shared.
@@ -119,7 +119,7 @@ function Board(props) {
     jumpTo(move) {
         console.log("The move is", move);
         console.log(this.state.history);
-        this.setState({...this.state, current: this.state.history[move]});
+        this.setState({current: this.state.history[move]});
     }
     render() {
         const moves = this.state.history.map((_, move)=>{
