@@ -92,7 +92,7 @@ class Game extends React.Component {
       const description = move ? `Go to move ${move}` : `Go to game start`;
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{description}</button>
+          <button onClick={this.jumpTo.bind(this, move)}>{description}</button>
         </li>
       );
     });
@@ -105,7 +105,7 @@ class Game extends React.Component {
                     player={this.state.current.player}
                     squares={this.state.current.squares}
                     status={this.state.current.status}
-                    squareClick={(i) => this.squareClick(i)}
+                    squareClick={this.squareClick.bind(this)}
                 />
                 </div>
                 <div className="game-info">
