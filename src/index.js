@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import {Board} from "./board";
 import {Clock} from "./clock";
+import {MovesList} from "./moveslist";
 
 class Game extends React.Component {
   lines = [
@@ -88,14 +89,6 @@ class Game extends React.Component {
     this.setState({ current: this.state.history[move] });
   }
   render() {
-    const moves = this.state.history.map((_, move) => {
-      const description = move ? `Go to move ${move}` : `Go to game start`;
-      return (
-        <li key={move}>
-          <button onClick={this.jumpTo.bind(this, move)}>{description}</button>
-        </li>
-      );
-    });
     return (
         <div>
             <Clock />
@@ -110,7 +103,7 @@ class Game extends React.Component {
                 </div>
                 <div className="game-info">
                 <div>{this.state.current.status}</div>
-                <ol>{moves}</ol>
+                <MovesList moves={this.state.history} buttonAction={this.jumpTo.bind(this)}/>
                 </div>
             </div>
         </div>
