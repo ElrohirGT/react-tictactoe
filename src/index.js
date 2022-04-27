@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import {Board} from "./board";
+import {Clock} from "./clock";
 
 class Game extends React.Component {
   lines = [
@@ -96,21 +97,24 @@ class Game extends React.Component {
       );
     });
     return (
-      <div className="game">
-        <div className="game-board">
-          <Board
-            player={this.state.current.player}
-            squares={this.state.current.squares}
-            status={this.state.current.status}
-            changeTurn={() => this.changeTurn()}
-            squareClick={(i) => this.squareClick(i)}
-          />
+        <div>
+            <Clock />
+            <div className="game">
+                <div className="game-board">
+                <Board
+                    player={this.state.current.player}
+                    squares={this.state.current.squares}
+                    status={this.state.current.status}
+                    changeTurn={() => this.changeTurn()}
+                    squareClick={(i) => this.squareClick(i)}
+                />
+                </div>
+                <div className="game-info">
+                <div>{this.state.current.status}</div>
+                <ol>{moves}</ol>
+                </div>
+            </div>
         </div>
-        <div className="game-info">
-          <div>{this.state.current.status}</div>
-          <ol>{moves}</ol>
-        </div>
-      </div>
     );
   }
 }
