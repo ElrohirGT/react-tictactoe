@@ -1,23 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
+import {Board} from "./board";
 
 class Game extends React.Component {
+  lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    //verticales
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    //diagonales
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  changeTurnDict = { "X":"O", "O":"X" };
   playerWon(squares, player) {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      //verticales
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      //diagonales
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-    for (let i = 0; i < lines.length; i++) {
-      const [a, b, c] = lines[i];
+    for (let i = 0; i < this.lines.length; i++) {
+      const [a, b, c] = this.lines[i];
       if (
         squares[a] &&
         squares[a] === player &&
@@ -34,10 +36,6 @@ class Game extends React.Component {
       if (squares[i] === null) return true;
     return false;
   }
-  changeTurn(currentPlayer) {
-    const changeTurnDict = { O: "X", X: "O" };
-    return changeTurnDict[currentPlayer];
-  }
   squareClick(i) {
     if (this.state.current.gameEnded) return;
 
@@ -53,7 +51,7 @@ class Game extends React.Component {
       newCurrentState.status = "DRAW";
       newCurrentState.gameEnded = true;
     } else {
-      let nextTurnPlayer = this.changeTurn(this.state.current.player);
+      let nextTurnPlayer = this.changeTurnDict[this.state.current.player];
       newCurrentState.status = `Player turn: ${nextTurnPlayer}`;
       newCurrentState.player = nextTurnPlayer;
     }
@@ -118,5 +116,5 @@ class Game extends React.Component {
 }
 
 // ========================================
-ReactDOM.createRoot(document.getElementById("root")).render(<Game/>);
+ReactDOM.createRoot(document.getElementById("root")).render(<Game />);
 // ReactDOM.render(<Game />, document.getElementById("root"));
