@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import {Board} from "./board";
-import {Clock} from "./clock";
-import {MovesList} from "./moveslist";
+import { Board } from "./board";
+import { Clock } from "./clock";
+import { MovesList } from "./moveslist";
 
-class Game extends React.Component {
-  lines = [
+function Game(props) {
+  const WIN_PATTERNS = [
+    //horizontales
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -18,97 +19,86 @@ class Game extends React.Component {
     [0, 4, 8],
     [2, 4, 6],
   ];
-  changeTurnDict = { "X":"O", "O":"X" };
-  playerWon(squares, player) {
-    for (let i = 0; i < this.lines.length; i++) {
-      const [a, b, c] = this.lines[i];
-      if (
-        squares[a] &&
-        squares[a] === player &&
-        squares[a] === squares[b] &&
-        squares[a] === squares[c]
-      ) {
-        return true;
+  const TURN_ORDER = { X: "O", O: "X" };
+  const [boardHistory, setBoardHistory] = useState([
+    {
+      player: "X",
+      squares: Array(9).fill(null),
+      status: "Player turn: X",
+      gameEnded: false,
+    },
+  ]);
+  const [currentBoard, setCurrentBoard] = useState(boardHistory[0]);
+
+  function jumpTo(boardIndex) {
+    setCurrentBoard(boardHistory[boardIndex]);
+  }
+  function playerWon(squares, player) {
+    for (let i = 0; i < WIN_PATTERNS.length; i++) {
+        const [a, b, c] = WIN_PATTERNS[i];
+        if (
+          squares[a] &&
+          squares[a] === player &&
+          squares[a] === squares[b] &&
+          squares[a] === squares[c]
+        ) {
+          return true;
+        }
       }
-    }
-    return false;
+      return false;
   }
-  emptySquaresRemaining(squares) {
+  function emptySquaresRemaining(squares) {
     for (let i = 0; i < squares.length; i++)
-      if (squares[i] === null) return true;
+        if (squares[i] === null) return true;
     return false;
   }
-  squareClick(i) {
-    if (this.state.current.gameEnded) return;
+
+  function squareClick(squareIndex) {
+    if (currentBoard.gameEnded) return;
 
     //Deep copy, this way the values between states are not shared.
-    const newCurrentState = JSON.parse(JSON.stringify(this.state.current));
-    if (newCurrentState.squares[i] !== null) return;
+    const newCurrentBoard = JSON.parse(JSON.stringify(currentBoard));
+    if (newCurrentBoard.squares[squareIndex] !== null) return;
 
-    newCurrentState.squares[i] = this.state.current.player;
-    if (this.playerWon(newCurrentState.squares, newCurrentState.player)) {
-      newCurrentState.status = `Winner: ${this.state.current.player}`;
-      newCurrentState.gameEnded = true;
-    } else if (!this.emptySquaresRemaining(newCurrentState.squares)) {
-      newCurrentState.status = "DRAW";
-      newCurrentState.gameEnded = true;
+    newCurrentBoard.squares[squareIndex] = currentBoard.player;
+    if (playerWon(newCurrentBoard.squares, newCurrentBoard.player)) {
+      newCurrentBoard.status = `Winner: ${currentBoard.player}`;
+      newCurrentBoard.gameEnded = true;
+    } else if (!emptySquaresRemaining(newCurrentBoard.squares)) {
+      newCurrentBoard.status = "DRAW";
+      newCurrentBoard.gameEnded = true;
     } else {
-      let nextTurnPlayer = this.changeTurnDict[this.state.current.player];
-      newCurrentState.status = `Player turn: ${nextTurnPlayer}`;
-      newCurrentState.player = nextTurnPlayer;
+      let nextTurnPlayer = TURN_ORDER[currentBoard.player];
+      newCurrentBoard.status = `Player turn: ${nextTurnPlayer}`;
+      newCurrentBoard.player = nextTurnPlayer;
     }
-    const indexOfState = this.state.history.indexOf(this.state.current);
+    const indexOfState = boardHistory.indexOf(currentBoard);
     //Slices so that when we go back in time,
     //the history array is chopped off and replaced with a new branch in time.
-    const history = this.state.history
-      .slice(0, indexOfState + 1)
-      .concat([newCurrentState]);
-    this.setState({
-      current: newCurrentState,
-      history,
-    });
+    const history = boardHistory.slice(0, indexOfState + 1).concat([newCurrentBoard]);
+    setBoardHistory(history);
+    setCurrentBoard(newCurrentBoard);
   }
-  constructor(props) {
-    super(props);
-    this.state = {
-      current: {},
-      history: [
-        {
-          player: "X",
-          squares: Array(9).fill(null),
-          status: "Player turn: X",
-          gameEnded: false,
-        },
-      ],
-    };
-    this.state.current = this.state.history[0];
-  }
-  jumpTo(move) {
-    console.log("The move is", move);
-    console.log(this.state.history);
-    this.setState({ current: this.state.history[move] });
-  }
-  render() {
-    return (
-        <div>
-            <Clock />
-            <div className="game">
-                <div className="game-board">
-                <Board
-                    player={this.state.current.player}
-                    squares={this.state.current.squares}
-                    status={this.state.current.status}
-                    squareClick={this.squareClick.bind(this)}
-                />
-                </div>
-                <div className="game-info">
-                <div>{this.state.current.status}</div>
-                <MovesList moves={this.state.history} buttonAction={this.jumpTo.bind(this)}/>
-                </div>
-            </div>
+
+  return (
+    <div>
+      <Clock />
+      <div className="game">
+        <div className="game-board">
+          <Board
+            player={currentBoard.player}
+            squares={currentBoard.squares}
+            status={currentBoard.status}
+            onSquareClick={squareClick}
+          />
         </div>
-    );
-  }
+        <div className="game-info">
+          <div>{currentBoard.status}</div>
+          <MovesList moves={boardHistory} onButtonClick={jumpTo} />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ========================================
