@@ -33,23 +33,24 @@ function Game(props) {
   function jumpTo(boardIndex) {
     setCurrentBoard(boardHistory[boardIndex]);
   }
+
   function playerWon(squares, player) {
     for (let i = 0; i < WIN_PATTERNS.length; i++) {
-        const [a, b, c] = WIN_PATTERNS[i];
-        if (
-          squares[a] &&
-          squares[a] === player &&
-          squares[a] === squares[b] &&
-          squares[a] === squares[c]
-        ) {
-          return true;
-        }
+      const [a, b, c] = WIN_PATTERNS[i];
+      if (
+        squares[a] &&
+        squares[a] === player &&
+        squares[a] === squares[b] &&
+        squares[a] === squares[c]
+      ) {
+        return true;
       }
-      return false;
+    }
+    return false;
   }
   function emptySquaresRemaining(squares) {
     for (let i = 0; i < squares.length; i++)
-        if (squares[i] === null) return true;
+      if (squares[i] === null) return true;
     return false;
   }
 
@@ -75,7 +76,9 @@ function Game(props) {
     const indexOfState = boardHistory.indexOf(currentBoard);
     //Slices so that when we go back in time,
     //the history array is chopped off and replaced with a new branch in time.
-    const history = boardHistory.slice(0, indexOfState + 1).concat([newCurrentBoard]);
+    const history = boardHistory
+      .slice(0, indexOfState + 1)
+      .concat([newCurrentBoard]);
     setBoardHistory(history);
     setCurrentBoard(newCurrentBoard);
   }
